@@ -10,17 +10,29 @@
 #include <numeric>
 #include <algorithm>
 #include <optional>
+#include <cmath>
 
 namespace fs = std::filesystem;
 using namespace std::literals;
 
+template <typename T>
+std::ostream& operator<<(std::ostream& out, const std::vector<T>& v)
+{
+    for (int i = 0; i < v.size(); ++i)
+    {
+        out << v[i] << " ";
+    }
+    return out;
+}
 
+template <typename F, int ARGNUM>
 class Tester
 {
 public:
 
-    Tester(const std::string& folder, const std::string & in_ext, const std::string& out_ext, std::function<std::string(std::string)> function)
-        : in_ext_(in_ext), out_ext_(out_ext), function_(function), folder_(folder)
+    Tester(const std::string& folder, const std::string& function_name, 
+           std::function<F> function, std::ostream& out_info = std::cout)
+        : folder_(folder), function_name_(function_name), function_(function), out_info_(out_info)
     {
 
     }
@@ -41,15 +53,33 @@ public:
         {
             {
                 std::ifstream in_file(file.string());
+                std::vector<std::string> args;
                 std::string in_line;
-                getline(in_file, in_line);
+                while (getline(in_file, in_line))
+                {
+                    args.push_back(in_line);
+                }
 
                 std::string out_filename = folder_ + "\\" + file.stem().string() + out_ext_;
                 std::ifstream out_file(out_filename);
                 std::string out_line;
                 getline(out_file, out_line);
-                std::string result = function_(in_line);
-                if (result == out_line)
+                std::string result;
+                {
+                    std::stringstream ss; ss << args;
+                    LOG_DURATION(std::format("{} FOR INPUT = ", function_name_) + ss.str() + "\n", out_info_);
+                    if constexpr (ARGNUM == 0)
+                        result = function_();
+                    else if constexpr (ARGNUM == 1)
+                        result = function_(args[0]);
+                    else if constexpr (ARGNUM == 2)
+                        result = function_(args[0], args[1]);
+                    else
+                    {
+                        std::cerr << "Unsupported number of arguments" << std::endl;
+                    }
+                }
+                if (CheckResult(result, out_line))
                 {
                     std::cout << file.filename() << ": " << "PASSED" << std::endl;
                     std::cout << "\tExpected: " << out_line << "\n\tResult: " << result << std::endl << std::endl;
@@ -63,6 +93,19 @@ public:
                 std::cout << "=======================================================\n\n";
             }
         }
+    }
+
+    bool CheckResult(const std::string res, const std::string target)
+    {
+        static double EPS = 1e-6;
+        size_t idx1 = 0, idx2 = 0;
+        double dres = std::stod(res, &idx1);
+        double dtarget = std::stod(target, &idx2);
+        if (idx1 != res.size() || idx2 != target.size())
+        {
+            return res == target;
+        }
+        return (abs(dres - dtarget) < EPS);
     }
 
 private:
@@ -91,8 +134,11 @@ private:
     };
 
 
-    std::string in_ext_;
-    std::string out_ext_;
+    std::string in_ext_ = ".in";
+    std::string out_ext_ = ".out";
     std::string folder_;
-    std::function<std::string(std::string)> function_;
+    std::function<F> function_;
+    std::string function_name_;
+    
+    std::ostream& out_info_;
 };
