@@ -12,6 +12,8 @@
 #include <optional>
 #include <cmath>
 
+#include "lint.hpp"
+
 namespace fs = std::filesystem;
 using namespace std::literals;
 
@@ -67,7 +69,7 @@ public:
                 std::string result;
                 {
                     std::stringstream ss; ss << args;
-                    LOG_DURATION(std::format("{} FOR INPUT = ", function_name_) + ss.str() + "\n", out_info_);
+                    LOG_DURATION(std::format("{} FOR INPUT = ", function_name_) + ss.str() + "\n");
                     if constexpr (ARGNUM == 0)
                         result = function_();
                     else if constexpr (ARGNUM == 1)
@@ -82,13 +84,13 @@ public:
                 if (CheckResult(result, out_line))
                 {
                     std::cout << file.filename() << ": " << "PASSED" << std::endl;
-                    std::cout << "\tExpected: " << out_line << "\n\tResult: " << result << std::endl << std::endl;
+                    //std::cout << "\tExpected: " << out_line << "\n\tResult: " << result << std::endl << std::endl;
                 }
                 else
                 {
                     std::cout << file.filename() << ": " << "FAILED" << std::endl;
                     std::cout << "\tINPUT: " << in_line << std::endl;
-                    std::cout << '\t' << "SHOULD BE: " << out_line << "\n\tRESULT: " << result << std::endl << std::endl;
+                    std::cout << '\t' /* << "SHOULD BE: " << out_line */ << "\n\tRESULT: " << result << std::endl << std::endl;
                 }
                 std::cout << "=======================================================\n\n";
             }
@@ -99,13 +101,18 @@ public:
     {
         static double EPS = 1e-6;
         size_t idx1 = 0, idx2 = 0;
-        double dres = std::stod(res, &idx1);
-        double dtarget = std::stod(target, &idx2);
-        if (idx1 != res.size() || idx2 != target.size())
+        try
         {
-            return res == target;
+            double dres = stod(res);
+            double dtarget = stod(target);
+            return (abs(dres - dtarget) < EPS);
         }
-        return (abs(dres - dtarget) < EPS);
+        catch (...)
+        {
+            apa::lint dres = apa::lint(res);
+            apa::lint dtarget = apa::lint(target);
+            return dres == dtarget;
+        }
     }
 
 private:

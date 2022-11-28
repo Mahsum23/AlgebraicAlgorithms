@@ -8,6 +8,7 @@
 #include "algo.hpp"
 
 
+
 using namespace std::chrono;
 
 double PowNaive(double n, size_t pow)
@@ -58,7 +59,7 @@ double PowTwoFactor(double n, size_t pow)
     return res;
 }
 
-size_t FibNaive(size_t n)
+apa::lint FibNaive(apa::lint n)
 {
     if (n > 50)
     {
@@ -72,7 +73,7 @@ size_t FibNaive(size_t n)
     return FibNaive(n - 1) + FibNaive(n - 2);
 }
 
-size_t FibIter(size_t n)
+apa::lint FibIter(apa::lint n)
 {
     if (n == 100)
     {
@@ -80,9 +81,9 @@ size_t FibIter(size_t n)
     }
     if (n < 2)
         return n;
-    size_t prev2 = 0;
-    size_t prev = 1;
-    size_t cur = 1;
+    apa::lint prev2 = 0;
+    apa::lint prev = 1;
+    apa::lint cur = 1;
     while (--n)
     {
         prev2 = prev;

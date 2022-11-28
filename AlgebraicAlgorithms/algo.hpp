@@ -1,11 +1,13 @@
 #pragma once
 
+#include "lint.hpp"
+
 double PowNaive(double n, size_t pow);
 double PowMult(double n, size_t pow);
 double PowTwoFactor(double n, size_t pow);
 
-size_t FibNaive(size_t n);
-size_t FibIter(size_t n);
+apa::lint FibNaive(apa::lint n);
+apa::lint FibIter(apa::lint n);
 size_t FibGoldenRatio(size_t n);
 size_t FibMatrix(size_t n);
 

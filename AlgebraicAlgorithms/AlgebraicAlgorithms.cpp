@@ -50,7 +50,7 @@ void TestFibo()
         Tester<std::string(std::string), 1> tester("fibo_tests", "Naive Fibo",
             [](std::string str)
             {
-                return std::to_string(FibNaive(strtoull(str.data(), NULL, 10)));
+                return FibNaive(apa::lint(str)).to_string();
             });
         tester.Run();
     }
@@ -59,7 +59,7 @@ void TestFibo()
         Tester<std::string(std::string), 1> tester("fibo_tests", "Iter Fibo",
             [](std::string str)
             {
-                return std::to_string(FibIter(strtoull(str.data(), NULL, 10)));
+                return FibIter(apa::lint(str)).to_string();
             });
         tester.Run();
     }
@@ -115,23 +115,21 @@ int main()
 {
     std::ofstream out;
 
-    //std::cout << "============================================" << std::endl;
-    //std::cout << "\t\t\t\tPOW\t\t\t\t" << std::endl;
-    //std::cout << "============================================" << std::endl;
+    std::cout << "============================================" << std::endl;
+    std::cout << "\t\t\t\tPOW\t\t\t\t" << std::endl;
+    std::cout << "============================================" << std::endl;
     //TestPow();
 
-    //std::cout << "============================================" << std::endl;
-    //std::cout << "\t\t\t\tSIEVE\t\t\t\t" << std::endl;
-    //std::cout << "============================================" << std::endl;
-    //TestSieve();
+    std::cout << "============================================" << std::endl;
+    std::cout << "\t\t\t\tSIEVE\t\t\t\t" << std::endl;
+    std::cout << "============================================" << std::endl;
+    TestSieve();
 
     std::cout << "============================================" << std::endl;
     std::cout << "\t\t\t\tFIBO\t\t\t\t" << std::endl;
     std::cout << "============================================" << std::endl;
     TestFibo();
 
-    
-    char c;
     std::cin >> std::ws;
     std::cin.get();
 }
