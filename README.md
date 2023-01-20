@@ -1,1 +1,1 @@
-# OTUS/Algorithms and data structures/(3)
+# OTUS/Algorithms and data structures/3
